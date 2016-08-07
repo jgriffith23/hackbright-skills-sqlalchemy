@@ -241,10 +241,6 @@ def get_brands_summary():
     '''Prints out each brand name, and each model name for that brand
     using only ONE database query.
 
-    Note: This docstest output is really too long to be here; it's drowning out
-    the actual function. But creating a separate doctest file didn't make
-    much sense in this context.
-
     >>> get_brands_summary()
     Ford Galaxie
     Ford Mustang
@@ -322,14 +318,12 @@ def get_brands_summary_objects():
     using only ONE database query. This time, uses a joinedload to get
     objects instead of tuples with just the data we need. """
 
+    # Use a joined load to fetch cars of all models and brands eagerly
     cars = Model.query.options(db.joinedload("brand")).all()
 
     # This for block is mostly the same as the one in the previous function. Now,
     # we just make an explicit check for if the brand actually isn't in the brands
-    # table.
-
-    # TODO: Ask someone who's managing the data in the database why Fillmore isn't
-    # in the brands table...
+    # table. I do realize that this one now doesn't get Tesla or Citroen!
     for car in cars:
         if car.name is None:
             print car.brand.name, "---"
