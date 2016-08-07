@@ -365,7 +365,32 @@ def get_brands_summary_objects():
 
 def search_brands_by_name(my_str):
     """Takes any string as a parameter. Returns a list of objects that are brands
-    whose name contains or is equal to the input string."""
+    whose name contains or is equal to the input string.
+
+    >>> find_beemers = search_brands_by_name("bMw")
+    >>> for brand in find_beemers:
+    ...     print brand
+    ...
+    <Brand name=BMW, founded=1916, headquarters=Munich, Bavaria, Germany, discontinued=None>
+
+    >>> find_or_cars = search_brands_by_name("OR")
+    >>> for brand in find_or_cars:
+    ...     print brand
+    ...
+    <Brand name=Ford, founded=1903, headquarters=Dearborn, MI, discontinued=None>
+    <Brand name=Fairthorpe, founded=1954, headquarters=Chalfont St Peter, Buckinghamshire, discontinued=1976>
+
+    >>> h_brands = search_brands_by_name("H")
+    >>> for brand in h_brands:
+    ...     print brand
+    ...
+    <Brand name=Chrysler, founded=1925, headquarters=Auburn Hills, Michigan, discontinued=None>
+    <Brand name=Hillman, founded=1907, headquarters=Ryton-on-Dunsmore, England, discontinued=1981>
+    <Brand name=Chevrolet, founded=1911, headquarters=Detroit, Michigan, discontinued=None>
+    <Brand name=Fairthorpe, founded=1954, headquarters=Chalfont St Peter, Buckinghamshire, discontinued=1976>
+    <Brand name=Plymouth, founded=1928, headquarters=Auburn Hills, Michigan, discontinued=2001>
+    >>>
+    """
 
     # Get "lowercase", "Title Case", and "UPPERCASE" versions of the entered
     # string, to use in the like() methods for our search query. This works
@@ -383,6 +408,40 @@ def search_brands_by_name(my_str):
     return brands
 
 
-
 def get_models_between(start_year, end_year):
-    pass
+    """Takes a start year and an end year as integers, and returns a list of objects
+    that are models with years that fall between the start year (inclusive) and the
+    end year (exclusive).
+
+    >>> sixties_sans_64 = get_models_between(1960,1964)
+    >>> for model in sixties_sans_64:
+    ...     print model
+    ...
+    <Model year=1960 brand_name=Chevrolet name=Corvair>
+    <Model year=1960 brand_name=Chevrolet name=Corvette>
+    <Model year=1960 brand_name=Fillmore name=Fillmore>
+    <Model year=1960 brand_name=Fairthorpe name=Rockette>
+    <Model year=1961 brand_name=Austin name=Mini Cooper>
+    <Model year=1961 brand_name=Studebaker name=Avanti>
+    <Model year=1961 brand_name=Pontiac name=Tempest>
+    <Model year=1961 brand_name=Chevrolet name=Corvette>
+    <Model year=1962 brand_name=Pontiac name=Grand Prix>
+    <Model year=1962 brand_name=Chevrolet name=Corvette>
+    <Model year=1962 brand_name=Studebaker name=Avanti>
+    <Model year=1962 brand_name=Buick name=Special>
+    <Model year=1963 brand_name=Austin name=Mini>
+    <Model year=1963 brand_name=Austin name=Mini Cooper S>
+    <Model year=1963 brand_name=Rambler name=Classic>
+    <Model year=1963 brand_name=Ford name=E-Series>
+    <Model year=1963 brand_name=Studebaker name=Avanti>
+    <Model year=1963 brand_name=Pontiac name=Grand Prix>
+    <Model year=1963 brand_name=Chevrolet name=Corvair 500>
+    <Model year=1963 brand_name=Chevrolet name=Corvette>
+    """
+
+    # Fetch the list of model objects, using the filter() method to
+    # set the inclusive lower bound and exclusive upper bound.
+    model_objects = Model.query.filter((Model.year >= start_year) &
+                                       (Model.year < end_year)).order_by(Model.year).all()
+
+    return model_objects
