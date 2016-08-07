@@ -90,7 +90,7 @@ WHERE models.year < %(year_1)s
 """
 
 # Get all brands that were founded after 1920.
-Brand.query.filter(founded > 1920).all()
+Brand.query.filter(Brand.founded > 1920).all()
 
 """Example usage:
 
@@ -202,25 +202,128 @@ WHERE models.brand_name != %(brand_name_1)s
 
 # Fill in the following functions. (See directions for more info.)
 
+
 def get_model_info(year):
     '''Takes in a year, and prints out each model, brand_name, and brand
-    headquarters for that year using only ONE database query.'''
+    headquarters for that year using only ONE database query.
 
-    pass
+    Test:
+
+    >>> get_model_info(1958)
+    <BLANKLINE>
+     Model: Thunderbird
+     Brand name: Ford
+     Brand HQ: Dearborn, MI
+    ----------------
+    <BLANKLINE>
+     Model: Corvette
+     Brand name: Chevrolet
+     Brand HQ: Detroit, Michigan
+    ----------------
+    <BLANKLINE>
+     Model: 600
+     Brand name: BMW
+     Brand HQ: Munich, Bavaria, Germany
+    ----------------
+    '''
+
+    # Load models from the given year eagerly, so we don't have to query the database
+    # every time we want to print the information.
+    models_in_year = Model.query.options(db.joinedload("brand")).filter_by(year=year).all()
+
+    # Print the name, brand, and HQ location for each model found
+    for model in models_in_year:
+        print "\n Model: %s\n Brand name: %s\n Brand HQ: %s\n----------------" % \
+              (model.name, model.brand_name, model.brand.headquarters)
+
 
 def get_brands_summary():
     '''Prints out each brand name, and each model name for that brand
-     using only ONE database query.'''
+     using only ONE database query.
 
-    pass
+    >>> get_brands_summary()
+    Ford Galaxie
+    Ford Mustang
+    Ford E-Series
+    Ford Thunderbird
+    Ford Thunderbird
+    Ford Model T
+    Chrysler Imperial
+    Citroen ---
+    Hillman Minx Magnificent
+    Chevrolet Corvette
+    Chevrolet Corvette
+    Chevrolet Corvair 500
+    Chevrolet Corvette
+    Chevrolet Corvette
+    Chevrolet Corvette
+    Chevrolet Corvair
+    Chevrolet Corvette
+    Chevrolet Corvette
+    Chevrolet Corvette
+    Chevrolet Corvette
+    Chevrolet Corvette
+    Chevrolet Corvette
+    Chevrolet Corvette
+    Cadillac Fleetwood
+    BMW 600
+    BMW 600
+    BMW 600
+    Austin Mini Cooper
+    Austin Mini Cooper S
+    Austin Mini
+    Austin Mini Cooper
+    Austin Mini
+    Fairthorpe Rockette
+    Studebaker Avanti
+    Studebaker Avanti
+    Studebaker Avanti
+    Studebaker Avanti
+    Pontiac Grand Prix
+    Pontiac Bonneville
+    Pontiac LeMans
+    Pontiac GTO
+    Pontiac Grand Prix
+    Pontiac Grand Prix
+    Pontiac Tempest
+    Buick Special
+    Rambler Classic
+    Plymouth Fury
+    Tesla ---
+    '''
+
+    # Fetch a list of tuples containing the brand name and model name for all cars in the
+    # database.
+    brands_and_models = db.session.query(Brand.name, Model.name).outerjoin(Model).all()
+
+    # Unpack tuples into two variables.
+    for brand, model in brands_and_models:
+        # Some brands don't have models. If the model exists, print brand and
+        # model name. Otherwise, just print the brand and characters to indicate
+        # a blank model.
+        if model is not None:
+            print brand, model
+        else:
+            print brand, "---"
 
 # -------------------------------------------------------------------
 # Part 2.5: Discussion Questions (Include your answers as comments.)
 
 # 1. What is the returned value and datatype of ``Brand.query.filter_by(name='Ford')``?
+# The returned value is <flask_sqlalchemy.BaseQuery object at 0x7f439e447f10>, which is
+# an object of the class flask_sqlalchemy.BaseQuery. This object represents the
+# query itself, not any value(s) in the database.
 
 # 2. In your own words, what is an association table, and what *type* of relationship
 # does an association table manage?
+#
+# An association table is a table that only exists to relate two other tables to
+# each other. Its fields don't actually tell you anything meaningful out of context
+# because it only contains the primary keys of the two tables to connect.
+#
+# Association tables are used in true many-to-many relationships, unlike middle
+# tables, which connect two one-to-many relationships to form a pseudo-many-to-many
+# relationship.
 
 # -------------------------------------------------------------------
 # Part 3

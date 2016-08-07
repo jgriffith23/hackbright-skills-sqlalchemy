@@ -15,7 +15,10 @@ db = SQLAlchemy()
 class Model(db.Model):
     """Car model."""
 
+    # Set the model's table name
     __tablename__ = "models"
+
+    # Create the columns for the models table
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     year = db.Column(db.Integer, nullable=False)
     brand_name = db.Column(db.String(50), db.ForeignKey('brands.name'), nullable=False)
@@ -23,7 +26,7 @@ class Model(db.Model):
 
     # Define relationship between brands and models. A brand can have
     # many models, but a model can belong to only one brand.
-    model = db.relationship("Brand", backref=db.backref("models", order_by=id))
+    brand = db.relationship("Brand", backref=db.backref("models", order_by=id))
 
     def __repr__(self):
         """Provide a human-readable representation of a model instance."""
@@ -35,14 +38,15 @@ class Model(db.Model):
 class Brand(db.Model):
     """Car brand."""
 
+    # Set the model's table name
     __tablename__ = "brands"
+
+    # Create the columns for the brands table
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
     founded = db.Column(db.Integer, nullable=True)
     headquarters = db.Column(db.String(50), nullable=True)
     discontinued = db.Column(db.Integer, nullable=True)
-
-
 
     def __repr__(self):
         """Provide a human-readable representation of a brand instance."""
