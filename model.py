@@ -47,7 +47,7 @@ class Brand(db.Model):
     def __repr__(self):
         """Provide a human-readable representation of a brand instance."""
 
-        return "<Brand name=%s, founded=%s, headquarters=%s, discontinued=%s" % \
+        return "<Brand name=%s, founded=%s, headquarters=%s, discontinued=%s>" % \
                (self.name, self.founded, self.headquarters, self.discontinued)
 
 
