@@ -239,7 +239,11 @@ def get_model_info(year):
 
 def get_brands_summary():
     '''Prints out each brand name, and each model name for that brand
-     using only ONE database query.
+    using only ONE database query.
+
+    Note: This docstest output is really too long to be here; it's drowning out
+    the actual function. But creating a separate doctest file didn't make
+    much sense in this context.
 
     >>> get_brands_summary()
     Ford Galaxie
@@ -296,15 +300,46 @@ def get_brands_summary():
     # database.
     brands_and_models = db.session.query(Brand.name, Model.name).outerjoin(Model).all()
 
+    # I don't see a way to get all brands without doing another query using this method,
+    # because there's a brand in the models table that has a model, but the brand is not
+    # listed in the brands table. I'll write another function that gets objects instead.
+
     # Unpack tuples into two variables.
     for brand, model in brands_and_models:
         # Some brands don't have models. If the model exists, print brand and
         # model name. Otherwise, just print the brand and characters to indicate
         # a blank model.
-        if model is not None:
-            print brand, model
-        else:
+        if model is None:
             print brand, "---"
+        elif brand is None:
+            print "---", model
+        else:
+            print brand, model
+
+
+def get_brands_summary_objects():
+    """Prints out each brand name, and each model name for that brand
+    using only ONE database query. This time, uses a joinedload to get
+    objects instead of tuples with just the data we need. """
+
+    cars = Model.query.options(db.joinedload("brand")).all()
+
+    # This for block is mostly the same as the one in the previous function. Now,
+    # we just make an explicit check for if the brand actually isn't in the brands
+    # table.
+
+    # TODO: Ask someone who's managing the data in the database why Fillmore isn't
+    # in the brands table...
+    for car in cars:
+        if car.name is None:
+            print car.brand.name, "---"
+        elif car.brand and car.brand_name is None:
+            print "---", car.name
+        elif car.brand is None:
+            print car.brand_name, car.name
+        else:
+            print car.brand.name, car.name
+
 
 # -------------------------------------------------------------------
 # Part 2.5: Discussion Questions (Include your answers as comments.)
@@ -328,8 +363,25 @@ def get_brands_summary():
 # -------------------------------------------------------------------
 # Part 3
 
-def search_brands_by_name(mystr):
-    pass
+def search_brands_by_name(my_str):
+    """Takes any string as a parameter. Returns a list of objects that are brands
+    whose name contains or is equal to the input string."""
+
+    # Get "lowercase", "Title Case", and "UPPERCASE" versions of the entered
+    # string, to use in the like() methods for our search query. This works
+    # given the nature of the data in the table.
+    my_str_lower = my_str.lower()
+    my_str_title = my_str.title()
+    my_str_upper = my_str.upper()
+
+    # Get all rows of brands table as objects. This technique works given the
+    # nature of the data in the table.
+    brands = Brand.query.filter((Brand.name.like("%" + my_str_lower + "%")) |
+                                (Brand.name.like("%" + my_str_title + "%")) |
+                                (Brand.name.like("%" + my_str_upper + "%"))).all()
+
+    return brands
+
 
 
 def get_models_between(start_year, end_year):

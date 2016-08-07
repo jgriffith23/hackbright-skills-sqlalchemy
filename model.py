@@ -21,6 +21,9 @@ class Model(db.Model):
     # Create the columns for the models table
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     year = db.Column(db.Integer, nullable=False)
+
+    # Each brand name is unique, so make the name field from the brands table
+    # a foreign key into models.
     brand_name = db.Column(db.String(50), db.ForeignKey('brands.name'), nullable=False)
     name = db.Column(db.String(50), nullable=False)
 
